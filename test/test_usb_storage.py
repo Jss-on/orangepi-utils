@@ -8,7 +8,7 @@ class TestUSBStorage(unittest.TestCase):
 
     @patch('os.path.ismount')
     @patch('builtins.open', mock_open(read_data="data"))
-    def test_read(self, mock_file, mock_ismount):
+    def test_read(self, mock_ismount):
         mock_ismount.return_value = True  
         storage = USBStorage()
         storage.mount_path = "/usb"
