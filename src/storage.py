@@ -85,3 +85,6 @@ class USBStorage:
             return statvfs.f_frsize * statvfs.f_blocks
         else:
             return "USB not connected"
+
+    def get_mount_path(self):
+        return self.mount_path
