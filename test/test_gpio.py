@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import patch, mock_open
+import sys
+sys.path.append('.')
 from src import GPIO
 
 class TestGPIO(unittest.TestCase):

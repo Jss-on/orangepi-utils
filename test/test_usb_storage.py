@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import patch, mock_open
+import sys
+sys.path.append('.')
 from src import USBStorage  # Modify based on your actual import path
 
 class TestUSBStorage(unittest.TestCase):

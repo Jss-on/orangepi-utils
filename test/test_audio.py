@@ -1,7 +1,9 @@
 import unittest
 from unittest.mock import patch
-from src import Audio  # Modify this line based on your actual import path
-
+from src import Audio
+import sys # Modify this line based on your actual import path
+sys.path.append('.')
+from src import Audio
 class TestAudio(unittest.TestCase):
 
     def test_init(self):
