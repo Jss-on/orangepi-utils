@@ -48,7 +48,7 @@ def push_button_indicator():
         else:
             count += 1
             print("Button is not pressed.")
-        
+        print(f"Count: {count}")
         if count == 15:
             led_indicator(time_interval=0.2, max_blink=15)
             gpio.digitalWrite("PA10", 0)
