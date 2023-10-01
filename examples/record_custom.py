@@ -1,4 +1,6 @@
 # Initialize
+import sys
+sys.path.append('.')
 from src import Audio
 audio = Audio()
 

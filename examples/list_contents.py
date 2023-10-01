@@ -1,4 +1,6 @@
 # Initialize the USBStorage class
+import sys
+sys.path.append('.')
 from src import USBStorage
 usb_storage = USBStorage()
 

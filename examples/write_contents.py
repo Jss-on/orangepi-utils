@@ -1,3 +1,5 @@
+import sys
+sys.path.append('.')
 from src import USBStorage
 usb_storage = USBStorage()
 status = usb_storage.write("hello.txt", "Hello, World!")
