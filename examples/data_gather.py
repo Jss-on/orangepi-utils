@@ -1,6 +1,8 @@
 import sys
 sys.path.append('.')
+import os
 import time
+import datetime
 from src import Audio, GPIO, USBStorage
 
 #setup GPIO for lED indicators and push buttons
@@ -63,13 +65,33 @@ def push_button_indicator():
 
 
 
-
-
 #setup for USB storage
+def main():
+    usb_storage = USBStorage()
+    #setup for audio record
+    audio = Audio()
 
-
-#setup for audio record
-
-if __name__ == "__main__":
+    mount_path = usb_storage.get_mount_path()
     led_indicator()
     push_button_indicator()
+    
+    
+    # Get the current timestamp
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    file_name = f"recording_{timestamp}.wav"
+    file_path = os.path.join(f"{mount_path}",f"{file_name}")
+
+
+
+    #setup for audio record
+    audio = Audio()
+    # Set custom settings
+    audio.setFilename(file_path)
+    audio.setDuration(30)  # 10 seconds
+    audio.setRate(16000)   # 22.05 kHz
+    # Record audio
+    audio.recordAudio()
+
+if __name__ == "__main__":
+    main()
