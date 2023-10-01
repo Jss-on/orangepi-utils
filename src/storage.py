@@ -17,7 +17,7 @@ class USBStorage:
     def mount_device(self):
         
         try:
-            subprocess.run(['sudo', 'mount', '/dev/sda1', '{self.mount_path}'], check=True)
+            subprocess.run(['sudo', 'mount', '/dev/sda1', f'{self.mount_path}'], check=True)
             print("Mount operation successful.")
         except subprocess.CalledProcessError:
             print("Failed to mount. Check device or directory.")
