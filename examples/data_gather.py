@@ -75,23 +75,26 @@ def main():
     led_indicator()
     push_button_indicator()
     
-    
-    # Get the current timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    while True:
+        try:
+            # Get the current timestamp
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    file_name = f"recording_{timestamp}.wav"
-    file_path = os.path.join(f"{mount_path}",f"{file_name}")
+            file_name = f"recording_{timestamp}.wav"
+            file_path = os.path.join(f"{mount_path}",f"{file_name}")
 
 
 
-    #setup for audio record
-    audio = Audio()
-    # Set custom settings
-    audio.setFilename(file_path)
-    audio.setDuration(30)  # 10 seconds
-    audio.setRate(16000)   # 22.05 kHz
-    # Record audio
-    audio.recordAudio()
+            #setup for audio record
+            audio = Audio()
+            # Set custom settings
+            audio.setFilename(file_path)
+            audio.setDuration(30)  # 10 seconds
+            audio.setRate(16000)   # 22.05 kHz
+            # Record audio
+            audio.recordAudio()
+        except KeyboardInterrupt:
+            print("Done")
 
 if __name__ == "__main__":
     main()
