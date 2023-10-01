@@ -41,6 +41,8 @@ def push_button_indicator():
         if count != 0:
             # Turn the LED on
             gpio.digitalWrite("PA10", 1)
+        else:
+            gpio.digitalWrite("PA10", 0)
         
         if button_state == 1:
             count = 0
