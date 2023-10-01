@@ -6,12 +6,12 @@ from src import GPIO
 gpio = GPIO()
 
 # Configure PA10 as an input pin
-gpio.pinMode("PA10", "in")
+gpio.pinMode("PG8", "in")
 
 # Monitor the button
 while True:
     # Read the state of the button
-    button_state = gpio.digitalRead("PA10")
+    button_state = gpio.digitalRead("PG8")
     
     if button_state == 1:
         print("Button is pressed.")
