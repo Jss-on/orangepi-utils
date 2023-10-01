@@ -1,18 +1,15 @@
 import os
 
 class USBStorage:
-    def begin(self):
-        self.mount_path = self._find_usb_mount_path()
-        return self.is_connected()
-
-    def _find_usb_mount_path(self):
-        with open("/proc/mounts", "r") as f:
-            lines = f.readlines()
-        for line in lines:
-            if "usb" in line:
-                parts = line.split(" ")
-                return parts[1]
-        return None  # return None if no USB is found
+    def __init__(self):
+        self.mount_path = "/media/orangepi_usb"
+        if not os.path.isdir(self.mount_path):
+            try:
+                os.mkdir(self.mount_path)
+                print(f"Directory {self.mount_path} created.")
+            except PermissionError:
+                print(f"You don't have permission to create {self.mount_path}. Try running the script as sudo.")
+        self.is_connected()
 
     def is_connected(self):
         return self.mount_path is not None and os.path.ismount(self.mount_path)
