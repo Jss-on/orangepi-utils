@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 class USBStorage:
     def __init__(self):
@@ -9,8 +10,21 @@ class USBStorage:
                 print(f"Directory {self.mount_path} created.")
             except PermissionError:
                 print(f"You don't have permission to create {self.mount_path}. Try running the script as sudo.")
+        self.mount_device()
         self.is_connected()
 
+
+    def mount_device(self):
+        
+        try:
+            subprocess.run(['sudo', 'mount', '/dev/sda1', '{self.mount_path}'], check=True)
+            print("Mount operation successful.")
+        except subprocess.CalledProcessError:
+            print("Failed to mount. Check device or directory.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+        
+    
     def is_connected(self):
         return self.mount_path is not None and os.path.ismount(self.mount_path)
 
