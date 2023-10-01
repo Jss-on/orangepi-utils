@@ -1,2 +1,2 @@
 #Running Test
-unittest test/test_gpio.p
+unittest test/test_gpio.py

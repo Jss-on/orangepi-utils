@@ -3,7 +3,7 @@ import sys
 sys.path.append('.')
 from src import Audio
 audio = Audio()
-audio.setFilename("BabyElephantWalk60.wav")
+audio.setFilename("examples/BabyElephantWalk60.wav")
 
 # Play audio
 audio.playAudio()
