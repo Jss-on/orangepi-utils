@@ -8,17 +8,17 @@ from src import Audio, GPIO, USBStorage
 gpio = GPIO()
 
 #Starting to run -> blinking PA20
-def led_indicator(time_interval=1, max_blink = 3):
-    gpio.pinMode("PA20", "out")
+def led_indicator(pin="PA20", time_interval=1, max_blink = 3):
+    gpio.pinMode(pin, "out")
     # Blink the LED
     count_blink = 0
     while True:
         # Turn the LED on
-        gpio.digitalWrite("PA20", 1)
+        gpio.digitalWrite(pin, 1)
         time.sleep(time_interval)  # Wait for 1 second
 
         # Turn the LED off
-        gpio.digitalWrite("PA20", 0)
+        gpio.digitalWrite(pin, 0)
         time.sleep(time_interval)  # Wait for 1 second
 
         if count_blink == max_blink:
@@ -32,6 +32,7 @@ def push_button_indicator():
     # Configure PA10 as an input pin
     gpio.pinMode("PG8", "in")
     gpio.pinMode("PA10", "out")
+    gpio.pinMode("PA20", "out")
     # Monitor the button
     count = 0
     while True:
@@ -53,6 +54,7 @@ def push_button_indicator():
         print(f"Count: {count}")
         if count == 15:
             led_indicator(time_interval=0.2, max_blink=15)
+            led_indicator(pin="PA10",time_interval=0.2, max_blink=15)
             gpio.digitalWrite("PA10", 0)
             break
 
