@@ -6,6 +6,7 @@ from python_speech_features import mfcc
 import joblib
 import time
 import sys
+from datetime import datetime
 
 sys.path.append(".")
 from src import USBStorage, GPIO
@@ -82,7 +83,10 @@ if __name__ == "__main__":
 
         print(f"Predicted Label: {predicted_label} with confidence {confidence:.2f}")
 
-        result = ",".join([str(count), predicted_label, str(confidence)])
+        # Get the current timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Create the result string with the timestamp
+        result = ",".join([timestamp, str(count), predicted_label, str(confidence)])
 
         usb_storage.append("inference result.txt", result + "\n")
 
