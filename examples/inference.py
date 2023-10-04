@@ -32,10 +32,10 @@ if __name__ == "__main__":
     # Load the trained model
     usb_storage = USBStorage()
     # model_path = usb_storage.get_file_path("best_audio_classifier_v1.pkl")
-    model = joblib.load("best_audio_classifier_v1.pkl")
+    model = joblib.load("example/best_audio_classifier_v1.pkl")
 
     # Audio settings
-    duration = 10  # 3 seconds
+    duration = 10  # 10 seconds
     samplerate = 16000  # 16 kHz
     filename = "temp_audio.wav"  # Temporary audio file name
 
@@ -50,7 +50,12 @@ if __name__ == "__main__":
 
         # Make prediction
         predicted_label = model.predict(mfcc_features)[0]
-        print(f"Predicted Label: {predicted_label}")
+
+        # Get confidence level
+        predicted_proba = model.predict_proba(mfcc_features)
+        confidence = np.max(predicted_proba)  # Take maximum probability as confidence
+
+        print(f"Predicted Label: {predicted_label} with confidence {confidence:.2f}")
 
         # Wait before capturing the next audio
-        time.sleep(1)  # wait for 3 seconds
+        time.sleep(1)  # wait for 1 second
