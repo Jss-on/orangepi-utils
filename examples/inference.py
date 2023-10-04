@@ -31,8 +31,8 @@ def extract_mfcc_features(audio_data, sample_rate=16000):
 if __name__ == "__main__":
     # Load the trained model
     usb_storage = USBStorage()
-    model_path = usb_storage.get_file_path("best_audio_classifier_v1.pkl")
-    model = joblib.load(model_path)
+    # model_path = usb_storage.get_file_path("best_audio_classifier_v1.pkl")
+    model = joblib.load("best_audio_classifier_v1.pkl")
 
     # Audio settings
     duration = 10  # 3 seconds
