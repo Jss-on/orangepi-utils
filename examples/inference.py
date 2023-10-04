@@ -62,7 +62,7 @@ if __name__ == "__main__":
     samplerate = 16000  # 16 kHz
     filename = "temp_audio.wav"  # Temporary audio file name
 
-    count 0
+    count = 0
     while True:
         # Capture audio
         gpio.digitalWrite(pin, 1)
@@ -82,9 +82,11 @@ if __name__ == "__main__":
 
         print(f"Predicted Label: {predicted_label} with confidence {confidence:.2f}")
 
-        result = ",".join(str(count),predicted_label,str(confidence))
-        usb_storage.append("inference result.txt",result)
+        result = ",".join([str(count), predicted_label, str(confidence)])
+
+        usb_storage.append("inference result.txt", result + "\n")
 
         gpio.digitalWrite(pin, 0)
+        count += 1
         # Wait before capturing the next audio
         time.sleep(1)  # wait for 1 second
