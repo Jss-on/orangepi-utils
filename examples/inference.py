@@ -5,6 +5,9 @@ from scipy.io import wavfile
 from python_speech_features import mfcc
 import joblib
 import time
+import sys
+
+sys.path.append(".")
 from src import USBStorage
 
 
