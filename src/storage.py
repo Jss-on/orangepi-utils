@@ -49,7 +49,7 @@ class USBStorage:
     def append(self, file_path, content):
         if self.is_connected():
             full_path = os.path.join(self.mount_path, file_path)
-            with open(full_path, "a") as f:
+            with open(full_path, "+a") as f:
                 f.write(content)
         else:
             return "USB not connected"
