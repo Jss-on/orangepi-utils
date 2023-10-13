@@ -61,7 +61,7 @@ while True:
         file_name = f"recording_{data_counter}.wav"
         file_path = os.path.join(f"{mount_path}",folder_name,f"{file_name}")
 
-
+        data_counter += 1
 
         #setup for audio record
         audio = Audio()
