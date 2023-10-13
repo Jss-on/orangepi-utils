@@ -50,7 +50,7 @@ mount_path = usb_storage.get_mount_path()
 unique_id = str(uuid.uuid4())
 
 folder_name = f"data_{unique_id}"
-usb_storage.append('records.txt',folder_name)
+usb_storage.append('records.txt',folder_name + '\n')
 usb_storage.mkdir(folder_name)
 
 data_counter = 0
