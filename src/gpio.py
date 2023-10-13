@@ -1,4 +1,3 @@
-
 import os
 import logging
 import subprocess
@@ -7,12 +6,24 @@ from typing import List, Dict
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 
-class GPIO:
 
+class GPIO:
     def __init__(self) -> None:
         self.base_path: str = "/sys/class/gpio"
+        self.led_base_path: str = "/sys/class/leds"
         logging.info("OPIGPIO initialized.")
-        
+
+    def _get_led_path(self, led_name: str) -> str:
+        full_led_name = (
+            f"orangepi:{led_name}:pwr"
+            if led_name == "green"
+            else f"orangepi:{led_name}:status"
+        )
+        return os.path.join(self.led_base_path, full_led_name, "brightness")
+
+    def _is_led(self, pin_label: str) -> bool:
+        return pin_label in ["green", "red"]
+
     def _change_permissions(self, path: str) -> None:
         try:
             subprocess.run(["sudo", "chmod", "666", path])
@@ -49,14 +60,13 @@ class GPIO:
         except IOError as e:
             logging.error(f"Failed to read from {path}: {e}")
             return ""
-    
+
     def setup(self) -> None:
         logging.info("Setup complete.")
 
-    
-    def togglePin(self, pin: int) -> None:
-        value = self.digitalRead(pin)
-        self.digitalWrite(pin, 1 - value)
+    def togglePin(self, pin_label: str) -> None:
+        value = self.digitalRead(pin_label)
+        self.digitalWrite(pin_label, 1 - value)
 
     def pinModeAll(self, pins: List[int], mode: str) -> None:
         for pin in pins:
@@ -82,36 +92,19 @@ class GPIO:
         gpio_path = os.path.join(self.base_path, f"gpio{pin}")
         if not os.path.exists(gpio_path):
             logging.error(f"Pin {pin} is not exported.")
-            return {}   
+            return {}
 
         direction_path = os.path.join(gpio_path, "direction")
         value_path = os.path.join(gpio_path, "value")
-        
+
         direction = self._read_from_file(direction_path)
         value = self._read_from_file(value_path)
 
-        return {
-            'direction': direction,
-            'value': value
-        }
-
-    def pulse(self, pin: int, duration: float) -> None:
-        import time
-        self.digitalWrite(pin, 1)
-        time.sleep(duration)
-        self.digitalWrite(pin, 0)
-
-    def blink(self, pin: int, duration: float, repetitions: int) -> None:
-        import time
-        for _ in range(repetitions):
-            self.digitalWrite(pin, 1)
-            time.sleep(duration / 2)
-            self.digitalWrite(pin, 0)
-            time.sleep(duration / 2)
+        return {"direction": direction, "value": value}
 
     @staticmethod
     def convertPinLabelToNumber(pin_label: str) -> int:
-        if not pin_label or len(pin_label) < 3 or pin_label[0] != 'P':
+        if not pin_label or len(pin_label) < 3 or pin_label[0] != "P":
             return -1  # Invalid pin label
 
         letter = pin_label[1].upper()
@@ -122,47 +115,66 @@ class GPIO:
         except ValueError:
             return -1  # Invalid pin number part
 
-        letter_position = ord(letter) - ord('A') + 1
+        letter_position = ord(letter) - ord("A") + 1
         pin_number = (letter_position - 1) * 32 + number
         return pin_number
 
+    # Modified pinMode method to handle both GPIO pins and built-in LEDs
     def pinMode(self, pin_label: str, mode: str) -> None:
-        pin = self.convertPinLabelToNumber(pin_label)
-        if pin == -1:
-            logging.error(f"Invalid pin label {pin_label}.")
-            return
-        export_path = os.path.join(self.base_path, "export")
-        self._write_to_file(export_path, str(pin))
+        if self._is_led(pin_label):
+            # LEDs don't have a 'mode' in the traditional sense, but you could add
+            # custom logic here if needed.
+            led_path = self._get_led_path(pin_label)
+            if not os.path.exists(led_path):
+                logging.error(f"LED {pin_label} does not exist.")
+                return
+            logging.info(f"Checked existence of LED {pin_label}.")
+        else:
+            pin = self.convertPinLabelToNumber(pin_label)
+            if pin == -1:
+                logging.error(f"Invalid pin label {pin_label}.")
+                return
+            export_path = os.path.join(self.base_path, "export")
+            self._write_to_file(export_path, str(pin))
 
-        gpio_path = os.path.join(self.base_path, f"gpio{pin}")
-        direction_path = os.path.join(gpio_path, "direction")
-        self._write_to_file(direction_path, mode)
+            gpio_path = os.path.join(self.base_path, f"gpio{pin}")
+            direction_path = os.path.join(gpio_path, "direction")
+            self._write_to_file(direction_path, mode)
 
-        logging.info(f"Set mode {mode} for pin {pin_label} ({pin}).")
-    
+            logging.info(f"Set mode {mode} for pin {pin_label} ({pin}).")
+
     def digitalWrite(self, pin_label: str, value: int) -> None:
-        pin = self.convertPinLabelToNumber(pin_label)
-        if pin == -1:
-            logging.error(f"Invalid pin label {pin_label}.")
-            return
-        gpio_path = os.path.join(self.base_path, f"gpio{pin}")
-        value_path = os.path.join(gpio_path, "value")
-        self._write_to_file(value_path, str(value))
+        if self._is_led(pin_label):
+            led_path = self._get_led_path(pin_label)
+            self._write_to_file(led_path, str(value))
+            logging.info(f"Wrote value {value} to LED {pin_label}.")
+        else:
+            pin = self.convertPinLabelToNumber(pin_label)
+            if pin == -1:
+                logging.error(f"Invalid pin label {pin_label}.")
+                return
+            gpio_path = os.path.join(self.base_path, f"gpio{pin}")
+            value_path = os.path.join(gpio_path, "value")
+            self._write_to_file(value_path, str(value))
+            logging.info(f"Wrote value {value} to pin {pin_label} ({pin}).")
 
-        logging.info(f"Wrote value {value} to pin {pin_label} ({pin}).")
-    
     def digitalRead(self, pin_label: str) -> int:
-        pin = self.convertPinLabelToNumber(pin_label)
-        if pin == -1:
-            logging.error(f"Invalid pin label {pin_label}.")
-            return -1
-        gpio_path = os.path.join(self.base_path, f"gpio{pin}")
-        value_path = os.path.join(gpio_path, "value")
-        value = int(self._read_from_file(value_path))
+        if self._is_led(pin_label):
+            led_path = self._get_led_path(pin_label)
+            value = int(self._read_from_file(led_path))
+            logging.info(f"Read value {value} from LED {pin_label}.")
+            return value
+        else:
+            pin = self.convertPinLabelToNumber(pin_label)
+            if pin == -1:
+                logging.error(f"Invalid pin label {pin_label}.")
+                return -1
+            gpio_path = os.path.join(self.base_path, f"gpio{pin}")
+            value_path = os.path.join(gpio_path, "value")
+            value = int(self._read_from_file(value_path))
+            logging.info(f"Read value {value} from pin {pin_label} ({pin}).")
+            return value
 
-        logging.info(f"Read value {value} from pin {pin_label} ({pin}).")
-        return value
-    
     def unexport(self, pin_label: str) -> None:
         pin = self.convertPinLabelToNumber(pin_label)
         if pin == -1:
@@ -170,5 +182,5 @@ class GPIO:
             return
         unexport_path = os.path.join(self.base_path, "unexport")
         self._write_to_file(unexport_path, str(pin))
-        
+
         logging.info(f"Unexported pin {pin_label} ({pin}).")
