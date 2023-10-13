@@ -72,8 +72,12 @@ while True:
         # Record audio
         gpio.digitalWrite("red", 1)
         audio.recordAudio()
-        gpio.digitalWrite("green", 0)
-        gpio.digitalWrite("red", 0)
+        for i in range(10):
+            gpio.digitalWrite("green", 0)
+            gpio.digitalWrite("red", 0)
+            time.sleep(0.1)
+            gpio.digitalWrite("green", 1)
+            gpio.digitalWrite("red", 1)
     except KeyboardInterrupt:
         print("Done")
-            break
+        break
