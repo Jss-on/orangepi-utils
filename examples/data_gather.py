@@ -95,6 +95,7 @@ def main():
             audio.recordAudio()
         except KeyboardInterrupt:
             print("Done")
+            break
 
 if __name__ == "__main__":
     main()
