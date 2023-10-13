@@ -1,4 +1,5 @@
 import time
+import sys
 sys.path.append('.')
 from src import GPIO
 # Assuming the GPIO class is imported or defined above this line
