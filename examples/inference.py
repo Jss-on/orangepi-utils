@@ -53,8 +53,9 @@ if __name__ == "__main__":
     # Load the trained model
     usb_storage = USBStorage()
     gpio = GPIO()
-    pin = "PA20"
-    gpio.pinMode(pin, "out")
+    # Setup (this is optional as the pinMode is not strictly necessary for the LEDs)
+    gpio.pinMode("green", "out")
+    gpio.pinMode("red", "out")
     # model_path = usb_storage.get_file_path("best_audio_classifier_v1.pkl")
     model = joblib.load("examples/best_audio_classifier_v1.pkl")
 
@@ -66,7 +67,9 @@ if __name__ == "__main__":
     count = 0
     while True:
         # Capture audio
-        gpio.digitalWrite(pin, 1)
+        gpio.digitalWrite("green", 1)
+        gpio.digitalWrite("red", 1)
+
         print("Capturing audio...")
         audio_data = capture_audio(duration, samplerate, filename)
 
@@ -74,9 +77,24 @@ if __name__ == "__main__":
         mfcc_features = extract_mfcc_features(audio_data, samplerate)
 
         # Make prediction
-
+        gpio.digitalWrite("green", 0)
+        gpio.digitalWrite("red", 0)
         predicted_label = model.predict(mfcc_features)[0]
 
+        if predicted_label == "normal":
+            for i in range(10):
+                gpio.digitalWrite("green", 0)
+                # gpio.digitalWrite("red", 0)
+                time.sleep(0.1)
+                gpio.digitalWrite("green", 1)
+                # gpio.digitalWrite("red", 1)
+        else:
+            for i in range(10):
+                # gpio.digitalWrite("green", 0)
+                gpio.digitalWrite("red", 0)
+                time.sleep(0.1)
+                # gpio.digitalWrite("green", 1)
+                gpio.digitalWrite("red", 1)
         # Get confidence level
         predicted_proba = model.predict_proba(mfcc_features)
         confidence = np.max(predicted_proba)  # Take maximum probability as confidence
@@ -90,7 +108,7 @@ if __name__ == "__main__":
 
         usb_storage.append("inference result.txt", result + "\n")
 
-        gpio.digitalWrite(pin, 0)
+        # gpio.digitalWrite(pin, 0)
         count += 1
         # Wait before capturing the next audio
         time.sleep(1)  # wait for 1 second
