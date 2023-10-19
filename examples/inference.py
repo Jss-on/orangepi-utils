@@ -29,26 +29,6 @@ def extract_mfcc_features(audio_data, sample_rate=16000):
     return np.mean(mfcc_features, axis=0).reshape(1, -1)
 
 
-def led_indicator(pin="PA20", time_interval=1, max_blink=3):
-    gpio.pinMode(pin, "out")
-    # Blink the LED
-    count_blink = 0
-    while True:
-        # Turn the LED on
-        gpio.digitalWrite(pin, 1)
-        time.sleep(time_interval)  # Wait for 1 second
-
-        # Turn the LED off
-        gpio.digitalWrite(pin, 0)
-        time.sleep(time_interval)  # Wait for 1 second
-
-        if count_blink == max_blink:
-            count_blink = 0
-            break
-
-        count_blink += 1
-
-
 if __name__ == "__main__":
     # Load the trained model
     usb_storage = USBStorage()
