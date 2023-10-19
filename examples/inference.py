@@ -57,7 +57,7 @@ if __name__ == "__main__":
     gpio.pinMode("green", "out")
     gpio.pinMode("red", "out")
     # model_path = usb_storage.get_file_path("best_audio_classifier_v1.pkl")
-    model = joblib.load("examples/best_audio_classifier_v1.pkl")
+    model = joblib.load("best_audio_classifier_v1.pkl")
 
     # Audio settings
     duration = 10  # 10 seconds
