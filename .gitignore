@@ -6,3 +6,7 @@ __pycache__/
 
 test_module.py
 tree.py
+test/
+data/abnormal/*.wav
+data/normal/*.wav
+design-files/
