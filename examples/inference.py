@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # Setup (this is optional as the pinMode is not strictly necessary for the LEDs)
     gpio.pinMode("green", "out")
     gpio.pinMode("red", "out")
-    # model_path = usb_storage.get_file_path("best_audio_classifier_v1.pkl")
+    # model_path = usb_torage.get_file_path("best_audio_classifier_v1.pkl")
     model = joblib.load("model_121323_1.pkl")
 
     # Audio settings
