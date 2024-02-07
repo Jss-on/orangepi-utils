@@ -11,3 +11,4 @@ test/
 data/abnormal/*.wav
 data/normal/*.wav
 design-files/
+README.md 
