@@ -14,7 +14,7 @@ from src import USBStorage, GPIO
 def get_preferred_device():
     # List available recording devices
     result = subprocess.run(["arecord", "-l"], capture_output=True, text=True)
-    lines = result.stdout.splitlines()
+    lines = result.stdout.split('\n')
     
     # Default device
     preferred_device = "hw:0,0"
@@ -23,13 +23,19 @@ def get_preferred_device():
         if "card" in line:
             # Extract card and device numbers
             parts = line.split()
-            card_number = parts[1].strip(":")
-            device_number = parts[3].strip(",")
-            
-            # Check for non-default device (i.e., not hw:0,0)
-            if card_number != "0" or device_number != "0":
-                preferred_device = f"hw:{card_number},{device_number}"
-                break  # Stop after finding the first non-default device
+            try:
+                card_index = parts.index('card')
+                device_index = parts.index('device')
+                card_number = parts[card_index+1].rstrip(':')
+                device_number = parts[device_index+1].rstrip(',')
+                
+                # Check for non-default device (i.e., not hw:0,0)
+                if card_number != "0" or device_number != "0":
+                    preferred_device = f"hw:{card_number},{device_number}"
+                    break  # Stop after finding the first non-default device
+            except ValueError:
+                # In case 'card' or 'device' keywords are not found as expected
+                continue
     
     return preferred_device
     
