@@ -7,35 +7,41 @@ import joblib
 import time
 import sys
 from datetime import datetime
+import re
 
 sys.path.append(".")
 from src import USBStorage, GPIO
 
+def extract_device_ids(arecord_output):
+    # Regular expression to match card and device numbers
+    regex = r"card (\d+):.*?device (\d+):"
+    
+    # Find all matches in the output
+    matches = re.findall(regex, arecord_output)
+    
+    # Generate the device identifiers
+    device_ids = [f"hw:{card},{device}" for card, device in matches]
+    
+    return device_ids
+    
 def get_preferred_device():
     # List available recording devices
     result = subprocess.run(["arecord", "-l"], capture_output=True, text=True)
-    lines = result.stdout.split('\n')
+    
     
     # Default device
     preferred_device = "hw:0,0"
     
-    for line in lines:
-        if "card" in line:
-            # Extract card and device numbers
-            parts = line.split()
-            try:
-                card_index = parts.index('card')
-                device_index = parts.index('device')
-                card_number = parts[card_index+1].rstrip(':')
-                device_number = parts[device_index+1].rstrip(',')
-                
-                # Check for non-default device (i.e., not hw:0,0)
-                if card_number != "0" or device_number != "0":
-                    preferred_device = f"hw:{card_number},{device_number}"
-                    break  # Stop after finding the first non-default device
-            except ValueError:
-                # In case 'card' or 'device' keywords are not found as expected
-                continue
+    # Ensure the command ran successfully
+    if result.returncode == 0:
+        # Extract device IDs from the arecord output
+        device_ids = extract_device_ids(result.stdout)
+        preferred_device = device_ids[1]
+        return device_ids[1]
+    else:
+        # Handle errors (e.g., command not found)
+        print("Error running 'arecord -l':", result.stderr)
+        return preferred_device
     
     return preferred_device
     
