@@ -11,15 +11,40 @@ from datetime import datetime
 sys.path.append(".")
 from src import USBStorage, GPIO
 
-
-# Function to capture audio using native ALSA command
+def get_preferred_device():
+    # List available recording devices
+    result = subprocess.run(["arecord", "-l"], capture_output=True, text=True)
+    lines = result.stdout.splitlines()
+    
+    # Default device
+    preferred_device = "hw:0,0"
+    
+    for line in lines:
+        if "card" in line:
+            # Extract card and device numbers
+            parts = line.split()
+            card_number = parts[1].strip(":")
+            device_number = parts[3].strip(",")
+            
+            # Check for non-default device (i.e., not hw:0,0)
+            if card_number != "0" or device_number != "0":
+                preferred_device = f"hw:{card_number},{device_number}"
+                break  # Stop after finding the first non-default device
+    
+    return preferred_device
+    
 def capture_audio(duration, samplerate, filename):
+    # Determine the preferred audio device
+    preferred_device = get_preferred_device()
+    
     command = (
-        f"arecord -D hw:0,0 -d {duration} -f S16_LE -r {samplerate} -c1 {filename}"
+        f"arecord -D {preferred_device} -d {duration} -f S16_LE -r {samplerate} -c1 {filename}"
     )
     subprocess.call(command, shell=True)
+    
     samplerate, audio_data = wavfile.read(filename)
     os.remove(filename)  # Remove the temporary audio file
+    
     return audio_data
 
 
